@@ -6,6 +6,7 @@
     "scripts": {
         "serve": "node ./dist/app.js",
         "build": "tsc",
+        "clean": "rm -r dist/",
         "dev:nodemon": "DEV=1 wait-on dist/app.js && nodemon dist/app.js",
         "dev:tsc": "tsc -w",
         "dev": "concurrently --kill-others \"npm run dev:tsc\" \"npm run dev:nodemon\""
@@ -23,9 +24,9 @@
         "wait-on": "3.3.0"
     },
     "dependencies": {
-        "body-parser": "1.17.1",
+        "body-parser": "1.19.0",
         "cors": "2.8.1",
-        "express": "4.15.2",
-        "moment": "^2.24.0"
+        "express": "4.17.1",
+        "moment": "2.24.0"
     }
 }
