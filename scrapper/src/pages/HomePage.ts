@@ -48,7 +48,6 @@ export default class HomePage extends BasePage {
             await this.page.waitFor(REFERENCE_NUMBER, { timeout: 8000 });
             return true;
         } catch (error) {
-            console.log("NOT REQUIRED");
             return false;
         }
     };

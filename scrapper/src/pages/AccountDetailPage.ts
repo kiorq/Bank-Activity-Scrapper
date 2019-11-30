@@ -16,6 +16,8 @@ export default class AccountDetailPage extends BasePage {
     };
 
     getSummaryData = async () => {
+        await this.page.waitFor(8000);
+
         log("Extracting data from summary tab");
 
         const summaryData = {};
