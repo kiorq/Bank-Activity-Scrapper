@@ -1,50 +1,62 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { getCurrentTimestamp } from "./service";
-import { AccountSummaryModel, TransactionModel } from "./models";
+import db from "./../../db";
+import { Transaction } from "./../../db/models";
 
 export default class AccountController {
     /*
      * controller for managing bank account summary and transaction
      */
-    productDataMap = null;
 
     constructor(router: Router) {
-        this.productDataMap = new Map();
-
-        router.get("/api/account/:accountNumber", this.getAccountSummary);
-        router.put("/api/account/:accountNumber", this.updateAccountSummary);
+        router.get("/api/account", this.getAccountSummary);
+        router.put("/api/account", this.addTransactions);
     }
 
     getAccountSummary = (req: Request, res: Response, next: NextFunction) => {
         /*
          * get account summary and transactions
          */
-        const { accountNumber } = req.params;
+        const summary = db.get("account_summary").value();
+        const transactions = db.get("transactions").value();
 
-        if (false) {
-            return res.sendStatus(404);
-        }
-
-        const accountSummary: AccountSummaryModel = {
-            accountName: "Kirk's Spending",
-            accountTotal: 1903.3,
-            accountCurrency: "KYD",
-            last_updated_timestamp: 10000000000,
-            transactions: []
-        };
-
-        return res.json(accountSummary);
+        return res.json({
+            summary,
+            transactions
+        });
     };
 
-    updateAccountSummary = (req: Request, res: Response, next: NextFunction) => {
+    addTransactions = (req: Request, res: Response, next: NextFunction) => {
         /*
          * updates account summary and add new transactions to account (bulk)
          */
 
-        const { accountNumber } = req.params;
-        const accountSummary: AccountSummaryModel = req.body;
-        const { accountTotal, transactions } = accountSummary;
-        const last_updated_timestamp: number = getCurrentTimestamp();
+        const reqTransactions: Array<Transaction> = req.body.transactions || [];
+        const reqTotalAmount: number = (req.body.total_amount && parseFloat(req.body.total_amount)) || null;
+
+        if (!reqTotalAmount) {
+            return res.status(400).json({ error: "total_amount required" });
+        }
+
+        if (reqTransactions.length == 0) {
+            return res.status(400).json({ error: "cannot update without new transactions" });
+        }
+
+        const transactions: Array<Transaction> = reqTransactions.map(
+            (txn): Transaction => {
+                return { ...txn };
+            }
+        );
+
+        // add each transaction
+        transactions.forEach((txn: Transaction) => {
+            db.get("transactions")
+                .push(txn)
+                .write();
+        });
+        // update last time checked
+        db.set("account_summary.last_checked_timestamp", getCurrentTimestamp()).write();
+        db.set("account_summary.total_amount", reqTotalAmount).write();
 
         return res.json({ success: true });
     };

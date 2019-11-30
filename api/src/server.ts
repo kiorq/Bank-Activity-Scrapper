@@ -9,7 +9,7 @@ export default class Server {
     public app: any;
     public port: number;
 
-    constructor(port = 8008) {
+    constructor(port: number) {
         this.app = express();
         this.port = port;
 
