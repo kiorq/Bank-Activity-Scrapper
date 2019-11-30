@@ -1,6 +1,6 @@
 import { requireValue } from "./service";
 import getBrowser from "./browser";
-import { prepareData, storeTransaction } from "./apiRequest";
+import { prepareData, storeTransactions } from "./storeData";
 
 // pages
 import HomePage from "./pages/HomePage";
@@ -9,6 +9,7 @@ import AccountDetailPage from "./pages/AccountDetailPage";
 
 const log = require("debug")("scrapper:main");
 
+const STORE_KEY: string = requireValue(process.env.STORE_KEY);
 const BANK_USERNAME: string = requireValue(process.env.BANK_USERNAME);
 const BANK_PASSWORD: string = requireValue(process.env.BANK_PASSWORD);
 const BANK_ACCOUNT_POSITION: number = parseInt(requireValue(process.env.BANK_ACCOUNT_POSITION));
@@ -52,14 +53,18 @@ const HEADLESS: number = parseInt(process.env.HEADLESS || "0");
 
         const requestData = prepareData(summaryData, activity);
 
-        console.log(activity);
-        console.log("requestData", requestData);
+        // store data in firebase
+        await storeTransactions(STORE_KEY, requestData);
+
+        log("Storred data in firebase");
     } catch (error) {
         console.log(error);
         log("Closing browser because of error");
         browser && (await browser.close());
+        return;
     } finally {
         log("Closing browser because script has ended");
-        // browser && (await browser.close());
+        browser && (await browser.close());
+        return;
     }
 })();
