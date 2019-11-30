@@ -111,13 +111,12 @@ export const storeTransactions = async (ref: string, requestData: RequestData) =
     const app = initializeApp();
     const newTransactions = await filterNewTransactions(ref, requestData.transactions);
 
-    log(`${newTransactions.length} new transaction found.`);
-
     if (newTransactions.length === 1) {
         log(`No new transactions to store`);
         return;
     }
 
+    log(`Storing ${newTransactions.length} new transactions.`);
     // store new transactions
     await Promise.all(
         newTransactions.map((txn: Transaction) => {

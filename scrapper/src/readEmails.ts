@@ -1,6 +1,6 @@
 var imaps = require("imap-simple");
 
-const readEmails = (user, password) => {
+export const readEmails = (user, password): Promise<object[]> => {
     return new Promise((resolve, reject) => {
         const config = {
             imap: {
@@ -37,4 +37,33 @@ const readEmails = (user, password) => {
     });
 };
 
-export default readEmails;
+export const findEmail = (subjectPattern: RegExp, timeout: number = 60000, user: string, password: string) => {
+    // keeps checking email for matched subject
+    return new Promise(async (resolve, reject) => {
+        let _checkTimeout = null;
+        const _checkEmails = async () => {
+            _checkTimeout = setTimeout(async () => {
+                const messagesFound = await readEmails(user, password);
+                const matchingEmail = messagesFound.find((message: object) => {
+                    return message["subject"].match(subjectPattern);
+                });
+
+                if (matchingEmail) {
+                    resolve(matchingEmail);
+                    clearTimeout(_checkTimeout);
+                    return;
+                }
+
+                await _checkEmails();
+            }, 7000);
+        };
+
+        // set timeout
+        setTimeout(() => {
+            clearTimeout(_checkTimeout);
+            reject(new Error("Timeout"));
+        }, timeout);
+
+        await _checkEmails();
+    });
+};

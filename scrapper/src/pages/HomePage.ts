@@ -1,11 +1,13 @@
 import BasePage from "./BasePage";
-import readEmails from "./../readEmails";
+import { findEmail } from "./../readEmails";
 const log = require("debug")("scrapper:page");
 
 const TEXTBOX_USERNAME = ".login-enclosure #login_username";
 const TEXTBOX_PASSWORD = ".login-enclosure #login_password";
 const BUTTON_SUBMIT = ".login-enclosure #login-button";
-const TEXTBOX_VERIFICATION = ".oj-inputpassword #otp";
+const TEXTBOX_VERIFICATION = "#otp";
+const REFERENCE_NUMBER = "#referenceNo";
+const BUTTON_VERIFICATION_SUBMIT = "button.action-button-primary";
 const CONTAINER_NETWORTH = ".networth";
 
 export default class HomePage extends BasePage {
@@ -42,11 +44,20 @@ export default class HomePage extends BasePage {
 
     isVerificationRequired = async () => {
         try {
-            await this.page.waitFor(TEXTBOX_VERIFICATION, { timeout: 8000 });
+            await this.page.waitFor(7000);
+            await this.page.waitFor(REFERENCE_NUMBER, { timeout: 8000 });
             return true;
         } catch (error) {
+            console.log("NOT REQUIRED");
             return false;
         }
+    };
+
+    getReferenceNumber = async () => {
+        const element = await this.page.$(REFERENCE_NUMBER);
+        const text = await this.page.evaluate(element => element.value, element);
+
+        return text;
     };
 
     handleVerification = async (login: string, password: string) => {
@@ -58,12 +69,20 @@ export default class HomePage extends BasePage {
 
         log("Verification required");
 
-        // give it some time for the email to send
-        await this.page.waitFor(40000);
-        // read new emails
-        const emailsFound = readEmails(login, password);
+        await this.page.waitFor(7000);
 
-        // TODO: filter out emails and find one with verification code
+        // get reference number
+        const referenceNumber = await this.getReferenceNumber();
+        const emailSubjectLookup = new RegExp(referenceNumber);
+        // look for verification email
+        const verificationEmail = await findEmail(emailSubjectLookup, 60000, login, password);
+        // get verification code
+        const verificationCode = verificationEmail["body"].match(/<strong>is ([0-9]+)<\/str/)[1];
+        // submit verification code
+        await this.sendKeys(TEXTBOX_VERIFICATION, verificationCode);
+        await this.click(BUTTON_VERIFICATION_SUBMIT);
+
+        log(`Handled verification for refNo: ${referenceNumber} - code: ${verificationCode}`);
     };
 
     succeeded = async () => {

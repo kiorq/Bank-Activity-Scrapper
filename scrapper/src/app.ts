@@ -1,5 +1,5 @@
 import { requireValue } from "./service";
-import getBrowser from "./browser";
+import { getBrowser, configPage } from "./browser";
 import { prepareData, storeTransactions } from "./storeData";
 
 // pages
@@ -25,8 +25,8 @@ const HEADLESS: number = parseInt(process.env.HEADLESS || "0");
             headless: HEADLESS === 1
         });
         // find page to use
-        const pagesFound = await browser.pages();
-        const page = pagesFound[0];
+        const page = await configPage(browser);
+
         // initiate page controllers
         const homePage = new HomePage(page);
         const dashboardPage = new DashboardPage(page);
@@ -42,7 +42,15 @@ const HEADLESS: number = parseInt(process.env.HEADLESS || "0");
 
         // dashboard
         await dashboardPage.waitFor();
-        await dashboardPage.navToAccountDetails();
+        try {
+            await dashboardPage.navToAccountDetails();
+        } catch (error) {
+            // hack to try and prevent script from failing
+            log("Could not navigate to account details, reloading and trying again");
+            await homePage.load();
+            await dashboardPage.waitFor();
+            await this.navToAccountDetails();
+        }
         await dashboardPage.selectAccount(BANK_ACCOUNT_POSITION);
         await dashboardPage.succeeded();
 
@@ -54,17 +62,16 @@ const HEADLESS: number = parseInt(process.env.HEADLESS || "0");
         const requestData = prepareData(summaryData, activity);
 
         // store data in firebase
+        log("Storing data extracted to firebase");
         await storeTransactions(STORE_KEY, requestData);
-
-        log("Storred data in firebase");
     } catch (error) {
         console.log(error);
         log("Closing browser because of error");
         browser && (await browser.close());
-        return;
+        process.exit(1);
     } finally {
         log("Closing browser because script has ended");
         browser && (await browser.close());
-        return;
+        process.exit();
     }
 })();

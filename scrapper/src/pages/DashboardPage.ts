@@ -25,6 +25,7 @@ export default class DashboardPage extends BasePage {
 
     navToAccountDetails = async () => {
         log("Navigating to account details");
+
         await this.click(MENU_BAR);
         await this.click(MENU_ACCOUNT_DROPDOWN);
         await this.click(MENU_CHECKING_SAVINGS_DROPDOWN);
