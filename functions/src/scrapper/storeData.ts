@@ -1,7 +1,6 @@
 import { amountToFloat } from "./service";
 const moment = require("moment");
 const firebase = require("firebase");
-const log = require("debug")("scrapper:store");
 
 export interface Transaction {
     description: string;
@@ -109,11 +108,11 @@ export const storeTransactions = async (ref: string, requestData: RequestData) =
     const newTransactions = await filterNewTransactions(ref, requestData.transactions);
 
     if (newTransactions.length === 1) {
-        log(`No new transactions to store`);
+        console.log(`No new transactions to store`);
         return;
     }
 
-    log(`Storing ${newTransactions.length} new transactions.`);
+    console.log(`Storing ${newTransactions.length} new transactions.`);
     // store new transactions
     await Promise.all(
         newTransactions.map((txn: Transaction) => {

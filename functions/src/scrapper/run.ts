@@ -20,6 +20,9 @@ const config: Config = {
     email: {
         login: requireValue(process.env.EMAIL_LOGIN),
         password: requireValue(process.env.EMAIL_PASSWORD)
+    },
+    run: {
+        as_script: "1"
     }
 };
 

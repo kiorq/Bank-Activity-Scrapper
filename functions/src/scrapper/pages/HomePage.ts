@@ -1,6 +1,5 @@
 import BasePage from "./BasePage";
 import { findEmail } from "./../readEmails";
-const log = require("debug")("scrapper:page");
 
 const TEXTBOX_USERNAME = ".login-enclosure #login_username";
 const TEXTBOX_PASSWORD = ".login-enclosure #login_password";
@@ -14,13 +13,13 @@ export default class HomePage extends BasePage {
     load = () => {
         const url = "https://www.butterfieldonline.com/";
 
-        log(`Loading ${url}`);
+        console.log(`Loading ${url}`);
 
         return this.page.goto(url);
     };
 
     waitFor = async () => {
-        log("Waiting for page to load");
+        console.log("Waiting for page to load");
 
         try {
             await Promise.all([
@@ -29,13 +28,13 @@ export default class HomePage extends BasePage {
                 this.page.waitFor(BUTTON_SUBMIT)
             ]);
         } catch (error) {
-            log("Could not find elements for page");
+            console.error("Could not find elements for page");
             throw error;
         }
     };
 
     login = async (login: string, password: string) => {
-        log("Filling login form");
+        console.log("Filling login form");
 
         await this.sendKeys(TEXTBOX_USERNAME, login);
         await this.sendKeys(TEXTBOX_PASSWORD, password);
@@ -66,7 +65,7 @@ export default class HomePage extends BasePage {
             return;
         }
 
-        log("Verification required");
+        console.log("Verification required");
 
         await this.page.waitFor(7000);
 
@@ -81,15 +80,15 @@ export default class HomePage extends BasePage {
         await this.sendKeys(TEXTBOX_VERIFICATION, verificationCode);
         await this.click(BUTTON_VERIFICATION_SUBMIT);
 
-        log(`Handled verification for refNo: ${referenceNumber} - code: ${verificationCode}`);
+        console.log(`Handled verification for refNo: ${referenceNumber} - code: ${verificationCode}`);
     };
 
     succeeded = async () => {
         try {
             await this.page.waitFor(CONTAINER_NETWORTH, { timeout: 15000 });
-            log("Logged in successfully");
+            console.log("Logged in successfully");
         } catch (error) {
-            log("Could not login");
+            console.error("Could not login");
             throw error;
         }
     };

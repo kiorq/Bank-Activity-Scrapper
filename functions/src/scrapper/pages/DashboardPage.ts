@@ -1,5 +1,4 @@
 import BasePage from "./BasePage";
-const log = require("debug")("scrapper:page");
 
 const CONTAINER_NETWORTH = ".networth";
 const MENU_BAR = ".icon-menu-bar";
@@ -13,18 +12,18 @@ const TEXT_NICKNAME = ".nickname";
 
 export default class DashboardPage extends BasePage {
     waitFor = async () => {
-        log("Waiting for dashboard to load");
+        console.log("Waiting for dashboard to load");
 
         try {
             await Promise.all([this.page.waitFor(CONTAINER_NETWORTH), this.page.waitFor(MENU_BAR)]);
         } catch (error) {
-            log("Dashboard didn't load");
+            console.error("Dashboard didn't load");
             throw error;
         }
     };
 
     navToAccountDetails = async () => {
-        log("Navigating to account details");
+        console.log("Navigating to account details");
 
         await this.click(MENU_BAR);
         await this.click(MENU_ACCOUNT_DROPDOWN);
@@ -33,7 +32,7 @@ export default class DashboardPage extends BasePage {
     };
 
     selectAccount = async (accountListPosition: number) => {
-        log(`Selecting account by position: ${accountListPosition}`);
+        console.log(`Selecting account by position: ${accountListPosition}`);
         await this.click(ACCOUNT_SELECT);
         await this.click(`${ACCOUNT_SELECT_OPTION}${accountListPosition + 1}`);
         await this.click(ACCOUNT_SELECT_PROCEED_BUTTON);
@@ -42,9 +41,9 @@ export default class DashboardPage extends BasePage {
     succeeded = async () => {
         try {
             await this.page.waitFor(TEXT_NICKNAME);
-            log("Successfully navigated to to account detail");
+            console.log("Successfully navigated to to account detail");
         } catch (error) {
-            log("Could not navigate to account detail");
+            console.error("Could not navigate to account detail");
             throw error;
         }
     };

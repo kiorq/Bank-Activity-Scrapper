@@ -1,16 +1,15 @@
 import BasePage from "./BasePage";
-const log = require("debug")("scrapper:page");
 
 const TEXT_NICKNAME = ".nickname";
 
 export default class AccountDetailPage extends BasePage {
     waitFor = async () => {
-        log("Waiting for account detail page");
+        console.log("Waiting for account detail page");
 
         try {
             await this.page.waitFor(TEXT_NICKNAME);
         } catch (error) {
-            log("account detail didn't load");
+            console.error("account detail didn't load");
             throw error;
         }
     };
@@ -18,7 +17,7 @@ export default class AccountDetailPage extends BasePage {
     getSummaryData = async () => {
         await this.page.waitFor(8000);
 
-        log("Extracting data from summary tab");
+        console.log("Extracting data from summary tab");
 
         const summaryData: any = {};
 
@@ -35,7 +34,7 @@ export default class AccountDetailPage extends BasePage {
     };
 
     getActivity = async () => {
-        log("Extracting data from activity tab");
+        console.log("Extracting data from activity tab");
 
         const activity = [];
 

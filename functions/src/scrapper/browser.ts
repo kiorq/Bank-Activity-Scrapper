@@ -1,6 +1,5 @@
 import { Browser } from "puppeteer";
 const puppeteer = require("puppeteer");
-const log = require("debug")("scrapper:browser");
 
 type BrowserSettings = {
     headless: boolean;
@@ -28,7 +27,7 @@ export const configPage = async (browser: Browser) => {
 
     // set user agent
     await page.setUserAgent(userAgent);
-    log(`User agent: ${userAgent}`);
+    console.log(`User agent: ${userAgent}`);
 
     return page;
 };

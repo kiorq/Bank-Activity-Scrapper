@@ -17,4 +17,7 @@ export type Config = {
         login: string;
         password: string;
     };
+    run: {
+        as_script: string;
+    };
 };

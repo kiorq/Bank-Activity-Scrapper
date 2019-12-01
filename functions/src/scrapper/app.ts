@@ -7,15 +7,11 @@ import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import AccountDetailPage from "./pages/AccountDetailPage";
 
-const debug = require("debug");
-const log = debug("scrapper:main");
-
 export default async (config: Config) => {
-    debug.enable(config.debug.enable);
-
     let browser = null;
+    const runAsScript = config.run && config.run.as_script === "1";
     try {
-        log("Starting up browser");
+        console.log("Starting up browser");
         browser = await getBrowser({
             headless: config.browser.headless === 1
         });
@@ -28,7 +24,7 @@ export default async (config: Config) => {
         const accountDetailPage = new AccountDetailPage(page);
 
         // login
-        log("Logging in");
+        console.log("Logging in");
         await homePage.load();
         await homePage.waitFor();
         await homePage.login(config.bank.username, config.bank.password);
@@ -41,7 +37,7 @@ export default async (config: Config) => {
             await dashboardPage.navToAccountDetails();
         } catch (error) {
             // hack to try and prevent script from failing
-            log("Could not navigate to account details, reloading and trying again");
+            console.log("Could not navigate to account details, reloading and trying again");
             await homePage.load();
             await dashboardPage.waitFor();
             await dashboardPage.navToAccountDetails();
@@ -57,15 +53,15 @@ export default async (config: Config) => {
         const requestData = prepareData(summaryData, activity);
 
         // store data in firebase
-        log("Storing data extracted to firebase");
+        console.log("Storing data extracted to firebase");
         await storeTransactions(config.store.key, requestData);
     } catch (error) {
-        log("Closing browser because of error", error);
+        console.log("Closing browser because of error", error);
         browser && (await browser.close());
-        process.exit(1);
+        runAsScript && process.exit(1);
     } finally {
-        log("Closing browser because script has ended");
+        console.log("Closing browser because script has ended");
         browser && (await browser.close());
-        process.exit();
+        runAsScript && process.exit();
     }
 };
