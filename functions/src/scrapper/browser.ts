@@ -16,7 +16,8 @@ const USER_AGENTS = [
 export const getBrowser = (settings: BrowserSettings) => {
     return puppeteer.launch({
         headless: settings.headless || false,
-        defaultViewport: { width: 800, height: 800 }
+        defaultViewport: { width: 800, height: 800 },
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 };
 
