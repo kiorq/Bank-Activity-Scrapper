@@ -16,13 +16,9 @@ type RequestData = {
     total_amount: number;
 };
 
-type SummaryData = {
-    AvailableBalance: string;
-};
-
-export const prepareData = (summaryData: object, activity: Array<object>): RequestData => {
+export const prepareData = (summaryData: any, activity: Array<object>): RequestData => {
     const transactions = activity.map(
-        (txn: object): Transaction => {
+        (txn: any): Transaction => {
             const amount = amountToFloat(txn["CreditAmount"] !== "" ? txn["CreditAmount"] : txn["DebitAmount"]);
             const type = txn["CreditAmount"] !== "" ? "credit" : "debit";
             const date = moment(txn["ValueDate"], "D MMM YYYY");
@@ -57,7 +53,7 @@ const initializeApp = () => {
     });
 };
 
-const getTransactions = async ref => {
+const getTransactions = async (ref: string) => {
     const snapshot = await firebase
         .database()
         .ref(`/${ref}/transactions`)
@@ -69,10 +65,10 @@ const getTransactions = async ref => {
     return (values && Object.values(values)) || [];
 };
 
-const filterNewTransactions = async (ref, transactions: Array<Transaction>): Promise<Transaction[]> => {
+const filterNewTransactions = async (ref: string, transactions: Array<Transaction>): Promise<Transaction[]> => {
     const transactionsStored = await getTransactions(ref);
-    const existingReferenceNos = transactionsStored.map((txn: Object) => txn["referenceNo"]);
-    const newTransactions = transactions.filter((txn: object) => {
+    const existingReferenceNos = transactionsStored.map((txn: any) => txn["referenceNo"]);
+    const newTransactions = transactions.filter((txn: any) => {
         return !existingReferenceNos.includes(txn["referenceNo"]);
     });
 
@@ -81,13 +77,13 @@ const filterNewTransactions = async (ref, transactions: Array<Transaction>): Pro
 
 const storeTransaction = async (ref: string, transaction: Transaction) => {
     // Get a key for a new Post.
-    var newTransactionKey = firebase
+    const newTransactionKey = firebase
         .database()
         .ref(ref)
         .child("transactions")
         .push().key;
 
-    const updates = {};
+    const updates: any = {};
     updates[`/${ref}/transactions/${newTransactionKey}`] = transaction;
 
     await firebase
@@ -97,7 +93,7 @@ const storeTransaction = async (ref: string, transaction: Transaction) => {
 };
 
 const updateSummary = async (ref: string, amount: number) => {
-    const updates = {};
+    const updates: any = {};
     updates[`/${ref}/total_amount`] = amount;
     updates[`/${ref}/timestamp`] = moment().unix();
 
@@ -108,7 +104,8 @@ const updateSummary = async (ref: string, amount: number) => {
 };
 
 export const storeTransactions = async (ref: string, requestData: RequestData) => {
-    const app = initializeApp();
+    initializeApp();
+
     const newTransactions = await filterNewTransactions(ref, requestData.transactions);
 
     if (newTransactions.length === 1) {

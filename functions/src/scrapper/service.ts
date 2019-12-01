@@ -6,7 +6,7 @@ export const requireValue = (value: any) => {
     return value;
 };
 
-export const randomBetween = (start, end) => {
+export const randomBetween = (start: number, end: number) => {
     return Math.floor(Math.random() * end) + start;
 };
 

@@ -20,7 +20,7 @@ export default class AccountDetailPage extends BasePage {
 
         log("Extracting data from summary tab");
 
-        const summaryData = {};
+        const summaryData: any = {};
 
         const rowsFound = await this.page.$$("row");
 

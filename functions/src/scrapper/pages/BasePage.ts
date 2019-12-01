@@ -1,9 +1,10 @@
 import { randomBetween } from "./../service";
+import { Page } from "puppeteer";
 
 export default class BasePage {
-    page = null;
+    page: Page;
 
-    constructor(page: Object) {
+    constructor(page: Page) {
         this.page = page;
     }
 
@@ -12,9 +13,9 @@ export default class BasePage {
 
         await this.page.focus(selector);
 
-        for (let i = 0; i < textArray.length; i++) {
+        for (const letter in textArray) {
             await this.page.waitFor(randomBetween(100, 280));
-            await this.page.keyboard.type(textArray[i]);
+            await this.page.keyboard.type(letter);
         }
     };
 

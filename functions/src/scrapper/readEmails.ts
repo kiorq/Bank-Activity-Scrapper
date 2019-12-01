@@ -1,6 +1,6 @@
-var imaps = require("imap-simple");
+const imaps = require("imap-simple");
 
-export const readEmails = (user, password): Promise<object[]> => {
+export const readEmails = (user: string, password: string): Promise<object[]> => {
     return new Promise((resolve, reject) => {
         const config = {
             imap: {
@@ -18,13 +18,13 @@ export const readEmails = (user, password): Promise<object[]> => {
             markSeen: true
         };
 
-        imaps.connect(config).then(connection => {
+        imaps.connect(config).then((connection: any) => {
             return connection.openBox("INBOX").then(() => {
-                return connection.search(searchCriteria, fetchOptions).then(function(results) {
-                    const messages = results.map(res => {
+                return connection.search(searchCriteria, fetchOptions).then(function(results: object[]) {
+                    const messages = results.map((res: any) => {
                         const parts = res.parts;
-                        const subject = parts.find(part => part.which === "HEADER").body.subject[0];
-                        const body = parts.find(part => part.which === "TEXT").body;
+                        const subject = parts.find((part: any) => part.which === "HEADER").body.subject[0];
+                        const body = parts.find((part: any) => part.which === "TEXT").body;
 
                         return { subject, body };
                     });
@@ -40,12 +40,12 @@ export const readEmails = (user, password): Promise<object[]> => {
 export const findEmail = (subjectPattern: RegExp, timeout: number = 60000, user: string, password: string) => {
     // keeps checking email for matched subject
     return new Promise(async (resolve, reject) => {
-        let _checkTimeout = null;
+        let _checkTimeout: NodeJS.Timer;
         const _checkEmails = async () => {
             _checkTimeout = setTimeout(async () => {
                 const messagesFound = await readEmails(user, password);
-                const matchingEmail = messagesFound.find((message: object) => {
-                    return message["subject"].match(subjectPattern);
+                const matchingEmail = messagesFound.find((message: any) => {
+                    return message.subject.match(subjectPattern);
                 });
 
                 if (matchingEmail) {

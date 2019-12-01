@@ -54,7 +54,7 @@ export default class HomePage extends BasePage {
 
     getReferenceNumber = async () => {
         const element = await this.page.$(REFERENCE_NUMBER);
-        const text = await this.page.evaluate(element => element.value, element);
+        const text = await this.page.evaluate((e: any) => e.value, element);
 
         return text;
     };
@@ -74,7 +74,7 @@ export default class HomePage extends BasePage {
         const referenceNumber = await this.getReferenceNumber();
         const emailSubjectLookup = new RegExp(referenceNumber);
         // look for verification email
-        const verificationEmail = await findEmail(emailSubjectLookup, 60000, login, password);
+        const verificationEmail: any = await findEmail(emailSubjectLookup, 60000, login, password);
         // get verification code
         const verificationCode = verificationEmail["body"].match(/<strong>is ([0-9]+)<\/str/)[1];
         // submit verification code

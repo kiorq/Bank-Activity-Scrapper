@@ -1,3 +1,4 @@
+import { Browser } from "puppeteer";
 const puppeteer = require("puppeteer");
 const log = require("debug")("scrapper:browser");
 
@@ -20,7 +21,7 @@ export const getBrowser = (settings: BrowserSettings) => {
     });
 };
 
-export const configPage = async browser => {
+export const configPage = async (browser: Browser) => {
     const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
     const pagesFound = await browser.pages();
     const page = pagesFound[0];
