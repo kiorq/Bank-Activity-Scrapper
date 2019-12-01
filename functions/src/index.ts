@@ -3,7 +3,7 @@ import scrapperRun from "./scrapper/app";
 
 const config: any = functions.config();
 
-export const ScrapeBankInfo = functions.pubsub.schedule("every 15 minutes").onRun(async context => {
+export const ScrapeBankActivity = functions.pubsub.schedule("every 15 minutes").onRun(async context => {
     await scrapperRun(config);
     return null;
 });
