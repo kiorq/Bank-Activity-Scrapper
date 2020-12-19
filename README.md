@@ -1,4 +1,4 @@
-# Kiorq Bank Activity Firebase Scrapper
+# Bank Activity Scrapper
 
 scheduled jobs that logs into my butterfield online banking account and scrapes the latest activity/transactions and stores it to a firebase database. From then the data can be used to make an improved view of banking transactions.
 
